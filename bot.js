@@ -1,3 +1,4 @@
+console.log('ALL ENV:', Deno.env.toObject());
 import { Client, GatewayIntentBits } from 'npm:discord.js@14.14.1';
 
 // === ENV PROMĚNNÉ ===
