@@ -1,6 +1,5 @@
-console.log('ALL ENV:', Deno.env.toObject());
 import { Client, GatewayIntentBits } from 'npm:discord.js@14.14.1';
-
+console.log('ALL ENV:', Deno.env.toObject());
 // === ENV PROMĚNNÉ ===
 const BOT_TOKEN = Deno.env.get('OTQ5NzI3NDQxOTE0NTc2OTU2.GfpTEU.yMp0X6_o9kunooTtoHL4wUSW7Ync-YH0DY2SUI');
 const GUILD_ID = '1007078594104807475';
