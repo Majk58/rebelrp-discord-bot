@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits } from 'npm:discord.js@14.14.1';
 
-const BOT_TOKEN = Deno.env.get('OTQ5NzI3NDQxOTE0NTc2OTU2.GYwBSq.6GYb1RcR2UO3iHYCXfys1fJj_pDzAB4kWmb8iM');
+const BOT_TOKEN = Deno.env.get('OTQ5NzI3NDQxOTE0NTc2OTU2.GlYihv.Mgdh3vL0pLhl3FIMGRhjtMEmsjrPPsJWyq0-Ug');
 const GUILD_ID = '1007078594104807475';
 const BASE44_API_URL = Deno.env.get('https://app.base44.com/api/apps/696a1a554d800f56c19ce8f7/entities/Product'); // URL tvé Base44 app
 const BASE44_SERVICE_KEY = Deno.env.get('a315e0756c954ab1b0133cf03a87d10e');
