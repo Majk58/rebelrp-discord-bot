@@ -1,33 +1,24 @@
 import { Client, GatewayIntentBits } from 'npm:discord.js@14.14.1';
 
 /* =========================
+   NAČTENÍ ENV PROMĚNNÝCH
+   ========================= */
+const BOT_TOKEN = Deno.env.get('OTQ5NzI3NDQxOTE0NTc2OTU2.GtHbyY.R4kqIieVy6ByvQ2gO8svBYTta2nzDTV90wbnto');
+const BASE44_API_URL = Deno.env.get('https://app.base44.com/api/apps/696a1a554d800f56c19ce8f7/entities/Product');
+const BASE44_SERVICE_KEY = Deno.env.get('a315e0756c954ab1b0133cf03a87d10e');
+const GUILD_ID = '1007078594104807475';
+
+/* =========================
    DIAGNOSTIKA ENV
    ========================= */
 console.log('ALL ENV:', Deno.env.toObject());
 
-/* =========================
-   ENV PROMĚNNÉ
-   ========================= */
-const BOT_TOKEN = Deno.env.get('OTQ5NzI3NDQxOTE0NTc2OTU2.GkTA5R.fwGrsi8guHH4tZlGYM_hrp4QVcTcpwlyBx6Haw');
-const GUILD_ID = '1007078594104807475';
-const BASE44_API_URL = Deno.env.get('https://app.base44.com/api/apps/696a1a554d800f56c19ce8f7/entities/Product');
-const BASE44_SERVICE_KEY = Deno.env.get('a315e0756c954ab1b0133cf03a87d10e');
+if (!BOT_TOKEN) console.error('❌ BOT_TOKEN není nastaven, login přeskočen');
+if (!BASE44_API_URL) console.error('❌ BASE44_API_URL není nastaven');
+if (!BASE44_SERVICE_KEY) console.error('❌ BASE44_SERVICE_KEY není nastaven');
 
 /* =========================
-   KONTROLA ENV (bez crashu)
-   ========================= */
-if (!BOT_TOKEN) {
-  console.error('❌ BOT_TOKEN chybí – bot se nepřihlásí');
-}
-if (!BASE44_API_URL) {
-  console.error('❌ BASE44_API_URL chybí');
-}
-if (!BASE44_SERVICE_KEY) {
-  console.error('❌ BASE44_SERVICE_KEY chybí');
-}
-
-/* =========================
-   DISCORD CLIENT
+   VYTVOŘENÍ DISCORD CLIENTA
    ========================= */
 const client = new Client({
   intents: [
@@ -38,7 +29,7 @@ const client = new Client({
 });
 
 /* =========================
-   SYNC FUNKCE
+   FUNKCE PRO SYNC S BASE44
    ========================= */
 async function syncPlayerStatus(discordId, data) {
   if (!BASE44_API_URL || !BASE44_SERVICE_KEY) return;
@@ -67,18 +58,17 @@ async function syncPlayerStatus(discordId, data) {
 }
 
 /* =========================
-   READY
+   EVENTY DISCORD BOTA
    ========================= */
+
+// Ready
 client.on('ready', () => {
   console.log(`✅ Bot připojen jako ${client.user.tag}`);
 });
 
-/* =========================
-   BAN
-   ========================= */
+// Member banned
 client.on('guildBanAdd', async (ban) => {
   if (ban.guild.id !== GUILD_ID) return;
-
   console.log(`🚫 Ban: ${ban.user.username}`);
   await syncPlayerStatus(ban.user.id, {
     is_blacklisted: true,
@@ -87,12 +77,9 @@ client.on('guildBanAdd', async (ban) => {
   });
 });
 
-/* =========================
-   UNBAN
-   ========================= */
+// Member unbanned
 client.on('guildBanRemove', async (ban) => {
   if (ban.guild.id !== GUILD_ID) return;
-
   console.log(`✅ Unban: ${ban.user.username}`);
   await syncPlayerStatus(ban.user.id, {
     is_blacklisted: false,
@@ -100,24 +87,18 @@ client.on('guildBanRemove', async (ban) => {
   });
 });
 
-/* =========================
-   MEMBER LEAVE
-   ========================= */
+// Member left server
 client.on('guildMemberRemove', async (member) => {
   if (member.guild.id !== GUILD_ID) return;
-
   console.log(`👋 Opustil server: ${member.user.username}`);
   await syncPlayerStatus(member.user.id, {
     is_on_server: false,
   });
 });
 
-/* =========================
-   MEMBER JOIN
-   ========================= */
+// Member joined server
 client.on('guildMemberAdd', async (member) => {
   if (member.guild.id !== GUILD_ID) return;
-
   console.log(`👋 Připojil se: ${member.user.username}`);
   await syncPlayerStatus(member.user.id, {
     is_on_server: true,
@@ -125,9 +106,7 @@ client.on('guildMemberAdd', async (member) => {
   });
 });
 
-/* =========================
-   ROLE UPDATE
-   ========================= */
+// Role updated
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (newMember.guild.id !== GUILD_ID) return;
 
@@ -143,17 +122,20 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 });
 
 /* =========================
-   LOGIN (jen pokud BOT_TOKEN existuje)
+   LOGIN DO DISCORDU
    ========================= */
 if (BOT_TOKEN) {
-  await client.login(BOT_TOKEN);
+  try {
+    await client.login(BOT_TOKEN);
+    console.log('✅ Bot se přihlásil na Discord');
+  } catch (err) {
+    console.error('❌ Chyba při loginu:', err);
+  }
 } else {
   console.error('❌ BOT_TOKEN není nastaven, login přeskočen');
 }
 
 /* =========================
-   KEEP ALIVE (Deno Deploy)
+   KEEP ALIVE PRO DENO DEPLOY
    ========================= */
-Deno.serve(() => new Response('Bot is running'));
-
-
+Deno.serve(() => new Response('Bot is running!'));
